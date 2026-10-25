@@ -78,7 +78,7 @@ main > * { margin: auto; }
 
 .board {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* minmax: cards may never push the grid wider */
   gap: 10px;
   width: 100%;
   max-width: 460px;
@@ -97,7 +97,8 @@ main > * { margin: auto; }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7%;
+  gap: 6%;
+  min-width: 0;
   padding: 6%;
   background: var(--surface);
   border: 3px solid transparent;
@@ -108,7 +109,8 @@ main > * { margin: auto; }
 }
 
 .card:focus-visible { outline: 3px solid var(--select); outline-offset: 2px; }
-.card svg { height: 100%; width: auto; overflow: visible; }
+/* Sized from the card's width: Safari can't resolve a percentage height from aspect-ratio. */
+.card svg { flex: none; width: 22%; height: auto; overflow: visible; }
 .card.selected { border-color: var(--select); transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22); }
 .card.hinted { border-color: #3d8bfd; }
 .card.good { border-color: var(--ok); }
