@@ -3,6 +3,8 @@
 The card game SET, playable in any browser and installable on iPhone as a home-screen app.
 Plain HTML/CSS/JavaScript — no build step, no dependencies.
 
+**Play:** <https://seton-game.sophie-taboada.workers.dev>
+
 ## Play locally
 
 ```sh
@@ -14,8 +16,8 @@ while on the same Wi-Fi (offline support needs HTTPS, so that only works once de
 
 ## Put it online
 
-Any static host works. For example with GitHub Pages: push this repo to GitHub, then
-*Settings → Pages → Deploy from branch* and pick the branch and `/ (root)`.
+The site is hosted on Cloudflare Workers (project `seton-game`), connected to this GitHub repo:
+every push to `master` deploys automatically.
 
 After deploying a change, bump `VERSION` in `sw.js` so installed copies update.
 
