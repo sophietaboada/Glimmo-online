@@ -4,6 +4,7 @@ import { toast } from './cards.js';
 
 const $ = (id) => document.getElementById(id);
 const NAME_KEY = 'set-player-name';
+const GROUP_INTRO = $('group-intro').innerHTML; // restored after an invite changed it
 
 function show(screen) {
   for (const id of ['menu', 'solo', 'group']) $(id).hidden = id !== screen;
@@ -41,6 +42,8 @@ function enterRoom(code) {
 function backToMenu() {
   stopSolo();
   leaveRoom();
+  $('group-intro').innerHTML = GROUP_INTRO;
+  $('create-room').hidden = false;
   show('menu');
 }
 
@@ -68,8 +71,14 @@ for (const id of ['menu-rules', 'rules-btn']) $(id).addEventListener('click', ()
 const invited = new URLSearchParams(location.search).get('room')?.toUpperCase();
 if (invited && /^[A-Z]{4}$/.test(invited)) {
   $('room-code').value = invited;
-  if (savedName()) enterRoom(invited);
-  else $('player-name').focus();
+  if (savedName()) {
+    enterRoom(invited);
+  } else {
+    // First visit from a QR code or link: make joining the obvious next step.
+    $('group-intro').textContent = `You’re invited to room ${invited}. Enter your name, then tap Join.`;
+    $('create-room').hidden = true;
+    $('player-name').focus();
+  }
 }
 
 if ('serviceWorker' in navigator) {

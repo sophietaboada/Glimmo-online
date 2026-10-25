@@ -7,7 +7,8 @@ Play alone, or as a group with everyone on their own phone.
 
 ## Group game
 
-One person taps **Create a room** and the others join with the 4-letter room code (or the **Invite** link).
+One person taps **Create a room**; the others scan the QR code on that phone with their camera, or enter
+the 4-letter room code. **Invite** shows the QR code again mid-game for anyone who arrives late.
 Everyone sees the same cards. When you spot a set, tap **SET!**: if you were first, you have 10 seconds
 to pick the three cards. Right is +1; wrong or out of time is −1 and you sit out until someone finds a set.
 
@@ -51,5 +52,6 @@ its memory while people are playing; nothing is written to storage.
 | `public/sw.js`, `manifest.webmanifest` | Offline support and home-screen install |
 | `src/worker.js` | Server: serves `public/` and runs group game rooms |
 | `wrangler.jsonc` | Cloudflare configuration |
+| `public/vendor/qrcode.mjs` | QR code library ([qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) 2.0.4, MIT), copied from `node_modules` |
 | `tools/make_icons.py` | Regenerates `public/icons/*.png` |
 | `tests/` | `game.test.mjs` (rules) and `room.test.mjs` (a full group game) |

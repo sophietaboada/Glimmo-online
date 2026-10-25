@@ -1,6 +1,6 @@
 // Caches the app shell so the game works offline once installed.
 // Bump VERSION whenever you deploy changes so phones pick up the new files.
-const VERSION = 'set-v3';
+const VERSION = 'set-v4';
 const FILES = [
   './',
   'index.html',
@@ -10,6 +10,7 @@ const FILES = [
   'game.js',
   'group.js',
   'solo.js',
+  'vendor/qrcode.mjs',
   'manifest.webmanifest',
   'icons/icon-180.png',
   'icons/icon-192.png',

@@ -1,4 +1,5 @@
 import { renderBoard, toast } from './cards.js';
+import qrcode from './vendor/qrcode.mjs';
 
 const $ = (id) => document.getElementById(id);
 const boardEl = $('group-board');
@@ -60,6 +61,27 @@ function connect() {
   });
 }
 
+function inviteUrl() {
+  return `${location.origin}${location.pathname}?room=${roomCode}`;
+}
+
+// Square SVG QR code, black on white with the standard 4-module quiet zone so phone cameras pick it up.
+function qrSvg(text) {
+  const qr = qrcode(0, 'M');
+  qr.addData(text);
+  qr.make();
+  const count = qr.getModuleCount();
+  const size = count + 8;
+  let modules = '';
+  for (let row = 0; row < count; row++) {
+    for (let col = 0; col < count; col++) {
+      if (qr.isDark(row, col)) modules += `M${col + 4} ${row + 4}h1v1h-1z`;
+    }
+  }
+  return `<svg viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" role="img" aria-label="QR code that opens the invite link">`
+    + `<rect width="${size}" height="${size}" fill="#fff"/><path d="${modules}" fill="#000"/></svg>`;
+}
+
 export function joinRoom(code, name) {
   roomCode = code;
   playerName = name;
@@ -70,6 +92,8 @@ export function joinRoom(code, name) {
   retries = 0;
   $('room-label').textContent = code;
   $('lobby-code').textContent = code;
+  $('invite-code').textContent = code;
+  $('lobby-qr').innerHTML = $('invite-qr').innerHTML = qrSvg(inviteUrl());
   $('scores').replaceChildren();
   boardEl.replaceChildren();
   $('lobby').hidden = false;
@@ -203,8 +227,10 @@ $('buzz').addEventListener('click', (event) => {
   if (action) send({ type: action });
 });
 
-$('invite').addEventListener('click', async () => {
-  const url = `${location.origin}${location.pathname}?room=${roomCode}`;
+$('invite').addEventListener('click', () => $('invite-dialog').showModal());
+
+$('share-link').addEventListener('click', async () => {
+  const url = inviteUrl();
   try {
     if (navigator.share) {
       await navigator.share({ title: 'SET', text: `Join my SET game (room ${roomCode})`, url });

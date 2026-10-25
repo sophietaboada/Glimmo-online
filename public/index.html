@@ -40,7 +40,7 @@
 
       <div class="group-box">
         <h2>Group game</h2>
-        <p class="muted">Sit together, everyone on their own phone. Spot a set, hit <b>SET!</b> first, then pick the cards.</p>
+        <p id="group-intro" class="muted">Sit together, everyone on their own phone. Spot a set, hit <b>SET!</b> first, then pick the cards.</p>
         <label for="player-name">Your name</label>
         <input id="player-name" maxlength="16" autocomplete="nickname" placeholder="e.g. Sam">
         <button id="create-room" class="primary" type="button">Create a room</button>
@@ -87,7 +87,8 @@
         <div id="lobby-waiting">
           <p class="muted">Room code</p>
           <p id="lobby-code" class="big-code"></p>
-          <p>Others join by entering this code under <b>Group game</b>, or tap <b>Invite</b> to send them a link.
+          <div id="lobby-qr" class="qr"></div>
+          <p>Scan with your phone camera to join, or enter the code under <b>Group game</b>.
             Everyone who joins appears above. Tap <b>Start game</b> when you’re all in.</p>
         </div>
         <div id="lobby-results" hidden>
@@ -116,6 +117,16 @@
     <p><b>Group game:</b> when you spot a set, tap <b>SET!</b>. If you were first, you have 10 seconds to pick
       the three cards. Right: +1 point. Wrong or out of time: −1 point, and you sit out until someone finds a set.</p>
     <form method="dialog"><button>Got it</button></form>
+  </dialog>
+
+  <dialog id="invite-dialog" class="invite-dialog">
+    <h2>Join room <span id="invite-code"></span></h2>
+    <p>Scan with your phone camera to join.</p>
+    <div id="invite-qr" class="qr"></div>
+    <form method="dialog" class="dialog-actions">
+      <button id="share-link" type="button" class="secondary">Share link</button>
+      <button>Done</button>
+    </form>
   </dialog>
 
   <dialog id="gameover">

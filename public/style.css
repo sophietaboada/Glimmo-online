@@ -289,6 +289,14 @@ input:focus-visible { outline: 3px solid var(--select); outline-offset: 1px; }
 .lobby { max-width: 420px; text-align: center; }
 .lobby p { margin: 0 0 12px; }
 .big-code { font-size: 52px; font-weight: 800; letter-spacing: 0.25em; color: var(--purple); }
+
+.qr { width: min(220px, 60vw); margin: 0 auto 16px; }
+.qr svg { display: block; width: 100%; height: auto; border-radius: 12px; }
+
+.invite-dialog { text-align: center; }
+.dialog-actions { display: flex; gap: 10px; justify-content: center; }
+dialog .secondary { background: none; color: var(--purple); box-shadow: inset 0 0 0 2px var(--purple); }
+dialog .secondary:hover { background: #f1eef7; }
 .winner { font-size: 26px; font-weight: 800; }
 
 .card.waiting { cursor: default; }
