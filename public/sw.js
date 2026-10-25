@@ -1,12 +1,15 @@
 // Caches the app shell so the game works offline once installed.
 // Bump VERSION whenever you deploy changes so phones pick up the new files.
-const VERSION = 'set-v1';
+const VERSION = 'set-v2';
 const FILES = [
   './',
   'index.html',
   'style.css',
   'app.js',
+  'cards.js',
   'game.js',
+  'group.js',
+  'solo.js',
   'manifest.webmanifest',
   'icons/icon-180.png',
   'icons/icon-192.png',
@@ -27,7 +30,7 @@ self.addEventListener('activate', (event) => {
 
 // Network first so updates show up when online; fall back to the cache when offline.
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  if (event.request.method !== 'GET' || new URL(event.request.url).pathname.startsWith('/api/')) return;
   event.respondWith(
     fetch(event.request)
       .then((response) => {

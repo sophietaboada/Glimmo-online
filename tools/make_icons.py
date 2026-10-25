@@ -55,7 +55,7 @@ def png(size):
 
 
 if __name__ == "__main__":
-    out = Path(__file__).resolve().parent.parent / "icons"
+    out = Path(__file__).resolve().parent.parent / "public" / "icons"
     out.mkdir(exist_ok=True)
     for size in (180, 192, 512):
         (out / f"icon-{size}.png").write_bytes(png(size))

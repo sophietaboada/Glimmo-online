@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "seton-game",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-01",
+  // Only the files in public/ are served to browsers.
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  // One Room per group game; it holds the shared table and relays moves between phones.
+  "durable_objects": { "bindings": [{ "name": "ROOMS", "class_name": "Room" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }]
+}

@@ -1,7 +1,7 @@
 // Run with: node --test tests/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Game, decode, findSet, isSet } from '../game.js';
+import { Game, decode, findSet, isSet } from '../public/game.js';
 
 const ATTRS = ['number', 'shape', 'color', 'shading'];
 
