@@ -85,9 +85,10 @@ test('group game', { skip: !BASE && 'set ROOM_URL to run against a server' }, as
   });
 
   await t.test('first to buzz gets the turn; others are ignored', async () => {
+    // Separate connections can arrive in any order, so only buzz again once Ben's turn is confirmed.
     b.send({ type: 'buzz' });
-    a.send({ type: 'buzz' });
     await everyone((p) => p.state.buzz?.playerId === 'b');
+    a.send({ type: 'buzz' });
     a.send({ type: 'pick', position: 0 });
     b.send({ type: 'pick', position: 99 });
     b.send('not json');
@@ -167,6 +168,9 @@ test('group game', { skip: !BASE && 'set ROOM_URL to run against a server' }, as
       await phone.until((p) => p.state.buzz?.playerId === phone.id);
       for (const position of findSet(phone.state.board)) phone.send({ type: 'pick', position });
       await phone.until((p) => p.state.event?.seq !== seq && p.state.buzz === null);
+      // Over the internet the other phones hear about it a moment later; wait so the loop sees game over.
+      const done = phone.state.event.seq;
+      await everyone((p) => p.state.event?.seq === done);
     }
     const { state } = phones[0];
     assert.equal(state.phase, 'over');
