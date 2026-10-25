@@ -1,6 +1,6 @@
 // Caches the app shell so the game works offline once installed.
 // Bump VERSION whenever you deploy changes so phones pick up the new files.
-const VERSION = 'set-v2';
+const VERSION = 'set-v3';
 const FILES = [
   './',
   'index.html',
