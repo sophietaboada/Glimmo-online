@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "seton-game",
+  "name": "glimmo-game",
   "main": "src/worker.js",
   "compatibility_date": "2026-09-01",
   // Only the files in public/ are served to browsers.

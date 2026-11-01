@@ -3,7 +3,7 @@
 A fast card-spotting game, playable in any browser and installable on iPhone as a home-screen app.
 Play alone, or as a group with everyone on their own phone.
 
-**Play:** <https://seton-game.sophie-taboada.workers.dev>
+**Play:** <https://glimmo-game.sophie-taboada.workers.dev>
 
 ## Group game
 
@@ -33,7 +33,7 @@ ROOM_URL=ws://127.0.0.1:8787 npm test   # also play a full group game against th
 
 ## Hosting
 
-Cloudflare Workers (project `seton-game`) is connected to this GitHub repo: every push to `master`
+Cloudflare Workers (project `glimmo-game`) is connected to this GitHub repo: every push to `master`
 deploys automatically. After changing files in `public/`, bump `VERSION` in `public/sw.js` so
 installed copies pick up the update.
 
