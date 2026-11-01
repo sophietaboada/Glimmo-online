@@ -3,7 +3,7 @@ import { joinRoom, leaveRoom, newRoomCode } from './group.js';
 import { toast } from './cards.js';
 
 const $ = (id) => document.getElementById(id);
-const NAME_KEY = 'set-player-name';
+const NAME_KEY = 'glimmo-player-name';
 const GROUP_INTRO = $('group-intro').innerHTML; // restored after an invite changed it
 
 function show(screen) {

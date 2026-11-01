@@ -2,7 +2,7 @@
 // Start one with `npm run dev`, then: ROOM_URL=ws://127.0.0.1:8787 node --test tests/room.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { findSet, isSet } from '../public/game.js';
+import { findMatch, isFullSpark, isMatch } from '../public/game.js';
 
 const BASE = process.env.ROOM_URL;
 const HTTP = BASE?.replace(/^ws/, 'http');
@@ -57,7 +57,7 @@ function roomCode() {
 function wrongTriple(board) {
   for (let i = 0; i < board.length; i++)
     for (let j = i + 1; j < board.length; j++)
-      for (let k = j + 1; k < board.length; k++) if (!isSet(board[i], board[j], board[k])) return [i, j, k];
+      for (let k = j + 1; k < board.length; k++) if (!isMatch(board[i], board[j], board[k])) return [i, j, k];
 }
 
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -98,21 +98,21 @@ test('group game', { skip: !BASE && 'set ROOM_URL to run against a server' }, as
     assert.ok(a.state.buzz.msLeft > 8000 && a.state.buzz.msLeft <= 10000);
   });
 
-  await t.test('a correct set scores +1 and deals new cards', async () => {
+  await t.test('a correct match scores its points and deals new cards', async () => {
     const board = b.state.board;
-    const set = findSet(board);
-    b.send({ type: 'pick', position: set[0] });
+    const match = findMatch(board);
+    b.send({ type: 'pick', position: match[0] });
     await everyone((p) => p.state.buzz?.picks.length === 1); // others see picks live
-    b.send({ type: 'pick', position: set[1] });
-    b.send({ type: 'pick', position: set[2] });
-    await everyone((p) => p.state.event?.kind === 'set');
-    assert.equal(b.me().score, 1);
+    b.send({ type: 'pick', position: match[1] });
+    b.send({ type: 'pick', position: match[2] });
+    await everyone((p) => p.state.event?.kind === 'match');
+    assert.equal(b.me().score, isFullSpark(...match.map((pos) => board[pos])) ? 2 : 1);
     assert.equal(a.state.buzz, null);
-    assert.ok(set.every((pos) => !a.state.board.includes(board[pos])));
-    assert.deepEqual(a.state.event.cards.sort(), set.map((pos) => board[pos]).sort());
+    assert.ok(match.every((pos) => !a.state.board.includes(board[pos])));
+    assert.deepEqual(a.state.event.cards.sort(), match.map((pos) => board[pos]).sort());
   });
 
-  await t.test('a wrong set scores −1 and sits that player out', async () => {
+  await t.test('a wrong match scores −1 and sits that player out', async () => {
     c.send({ type: 'buzz' });
     await c.until((p) => p.state.buzz?.playerId === 'c');
     for (const position of wrongTriple(c.state.board)) c.send({ type: 'pick', position });
@@ -132,15 +132,18 @@ test('group game', { skip: !BASE && 'set ROOM_URL to run against a server' }, as
     assert.equal(b.me().lockedOut, false);
   });
 
-  await t.test('the next set lets everyone play again', async () => {
+  await t.test('the next match lets everyone play again', async () => {
+    const before = b.me().score;
     b.send({ type: 'buzz' });
     await b.until((p) => p.state.buzz?.playerId === 'b');
-    for (const position of findSet(b.state.board)) b.send({ type: 'pick', position });
-    await everyone((p) => p.state.event?.kind === 'set' && p.state.players.every((q) => !q.lockedOut));
-    assert.equal(b.me().score, 2);
+    const cards = findMatch(b.state.board).map((pos) => b.state.board[pos]);
+    for (const position of findMatch(b.state.board)) b.send({ type: 'pick', position });
+    await everyone((p) => p.state.event?.kind === 'match' && p.state.players.every((q) => !q.lockedOut));
+    assert.equal(b.me().score, before + (isFullSpark(...cards) ? 2 : 1));
   });
 
   await t.test('leaving mid-turn frees the table without a penalty; rejoining keeps the score', async () => {
+    const score = b.me().score;
     b.send({ type: 'buzz' });
     await a.until((p) => p.state.buzz?.playerId === 'b');
     b.close();
@@ -148,7 +151,7 @@ test('group game', { skip: !BASE && 'set ROOM_URL to run against a server' }, as
     const back = new Phone(code, 'b', 'Ben');
     phones[1] = back;
     await back.until((p) => p.state?.players.find((q) => q.id === 'b').connected);
-    assert.equal(back.me().score, 2);
+    assert.equal(back.me().score, score);
   });
 
   await t.test('opening the same player twice hands the seat to the newest connection', async () => {
@@ -166,7 +169,7 @@ test('group game', { skip: !BASE && 'set ROOM_URL to run against a server' }, as
       const seq = phone.state.event?.seq;
       phone.send({ type: 'buzz' });
       await phone.until((p) => p.state.buzz?.playerId === phone.id);
-      for (const position of findSet(phone.state.board)) phone.send({ type: 'pick', position });
+      for (const position of findMatch(phone.state.board)) phone.send({ type: 'pick', position });
       await phone.until((p) => p.state.event?.seq !== seq && p.state.buzz === null);
       // Over the internet the other phones hear about it a moment later; wait so the loop sees game over.
       const done = phone.state.event.seq;
@@ -175,7 +178,7 @@ test('group game', { skip: !BASE && 'set ROOM_URL to run against a server' }, as
     const { state } = phones[0];
     assert.equal(state.phase, 'over');
     assert.equal(state.deck, 0);
-    assert.equal(findSet(state.board), null);
+    assert.equal(findMatch(state.board), null);
   });
 
   await t.test('a new game resets the scores', async () => {

@@ -3,7 +3,7 @@ import { formatTime, renderBoard, toast } from './cards.js';
 
 const $ = (id) => document.getElementById(id);
 const boardEl = $('solo-board');
-const BEST_KEY = 'set-best-time';
+const BEST_KEY = 'glimmo-best-time';
 
 let game;
 let selected = [];
@@ -15,7 +15,7 @@ function render() {
   renderBoard(boardEl, game.board, (el, position) => {
     el.classList.toggle('selected', selected.includes(position));
   });
-  $('found').textContent = game.found;
+  $('found').textContent = game.points;
   $('deck').textContent = game.deck.length;
 }
 
@@ -49,9 +49,10 @@ function checkSelection() {
   const positions = selected;
   const els = positions.map(cardAt);
   busy = true;
-  if (game.claim(positions)) {
+  const points = game.claim(positions);
+  if (points) {
     els.forEach((el) => el.classList.add('good'));
-    toast('SET!');
+    toast(points === 2 ? 'Full spark! +2' : 'Match!');
     setTimeout(() => {
       selected = [];
       busy = false;
@@ -61,7 +62,7 @@ function checkSelection() {
     }, 350);
   } else {
     els.forEach((el) => el.classList.add('bad'));
-    toast('Not a set');
+    toast('Not a match');
     setTimeout(() => {
       els.forEach((el) => el.classList.remove('bad', 'selected'));
       selected = [];
@@ -70,13 +71,13 @@ function checkSelection() {
   }
 }
 
-// First hint reveals one card of a set, the next reveals a second card.
+// First hint reveals one card of a match, the next reveals a second card.
 function showHint() {
   if (busy || game.over) return;
-  const set = game.hint();
-  if (!set) return;
-  const shown = set.filter((p) => cardAt(p).classList.contains('hinted')).length;
-  const next = set.find((p) => !cardAt(p).classList.contains('hinted'));
+  const match = game.hint();
+  if (!match) return;
+  const shown = match.filter((p) => cardAt(p).classList.contains('hinted')).length;
+  const next = match.find((p) => !cardAt(p).classList.contains('hinted'));
   if (shown < 2) cardAt(next).classList.add('hinted');
   else toast('Two cards are shown — find the third!');
 }
@@ -93,7 +94,7 @@ function finish() {
     }
   } catch { /* storage unavailable (e.g. private mode) */ }
   const parts = [
-    `You found ${game.found} sets in ${formatTime(elapsed)}.`,
+    `You scored ${game.points} points (${game.found} matches, ${game.points - game.found} full sparks) in ${formatTime(elapsed)}.`,
     `Mistakes: ${game.mistakes}. Hints: ${game.hints}.`,
   ];
   if (best) parts.push(`Best time without hints: ${formatTime(best)}.`);

@@ -4,7 +4,7 @@ import qrcode from './vendor/qrcode.mjs';
 const $ = (id) => document.getElementById(id);
 const boardEl = $('group-board');
 const CODE_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // no I or O, which look like 1 and 0
-const ID_KEY = 'set-player-id';
+const ID_KEY = 'glimmo-player-id';
 const REPLACED = 4001; // close code the room sends when this player connected again elsewhere
 
 let roomCode;
@@ -142,11 +142,13 @@ function update(next) {
   render();
 }
 
-function announce({ kind, playerId: who, name }) {
+function announce({ kind, playerId: who, name, points }) {
   const mine = who === me;
   const messages = {
-    set: mine ? 'SET! +1' : `${name} found a SET`,
-    miss: mine ? 'Not a set −1' : `${name} missed −1`,
+    match: points === 2
+      ? (mine ? 'FULL SPARK! +2' : `${name} found a full spark +2`)
+      : (mine ? 'MATCH! +1' : `${name} found a match`),
+    miss: mine ? 'Not a match −1' : `${name} missed −1`,
     timeout: mine ? 'Time’s up −1' : `${name} ran out of time −1`,
   };
   toast(messages[kind]);
@@ -206,8 +208,8 @@ function renderButton() {
     else if (phase === 'over') [label, action] = ['New game', 'start'];
     else if (buzz?.playerId === me) label = `Pick 3 cards · ${seconds}`;
     else if (buzz) label = `${nameOf(buzz.playerId)} is picking · ${seconds}`;
-    else if (meNow?.lockedOut) label = 'Wait for the next set';
-    else [label, action] = ['SET!', 'buzz'];
+    else if (meNow?.lockedOut) label = 'Wait for the next match';
+    else [label, action] = ['MATCH!', 'buzz'];
     button.classList.toggle('mine', buzz?.playerId === me);
   }
   button.textContent = label;
@@ -233,7 +235,7 @@ $('share-link').addEventListener('click', async () => {
   const url = inviteUrl();
   try {
     if (navigator.share) {
-      await navigator.share({ title: 'SET', text: `Join my SET game (room ${roomCode})`, url });
+      await navigator.share({ title: 'Glimmo', text: `Join my Glimmo game (room ${roomCode})`, url });
       return;
     }
     await navigator.clipboard.writeText(url);

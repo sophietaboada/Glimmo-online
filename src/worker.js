@@ -29,7 +29,7 @@ export class Room extends DurableObject {
     this.phase = 'lobby'; // 'lobby' | 'playing' | 'over'
     this.game = null;
     this.buzz = null; // { playerId, picks, deadline, timer } while someone is picking cards
-    this.event = null; // last set found / missed, so phones can announce it
+    this.event = null; // last match found / missed, so phones can announce it
     this.seq = 0;
   }
 
@@ -116,16 +116,17 @@ export class Room extends DurableObject {
       return;
     }
     const cards = buzz.picks.map((p) => this.game.board[p]);
-    this.finishBuzz(this.game.claim(buzz.picks) ? 'set' : 'miss', cards);
+    const points = this.game.claim(buzz.picks);
+    this.finishBuzz(points ? 'match' : 'miss', cards, points);
   }
 
-  // Right: +1 and everyone may buzz again. Wrong or out of time: −1 and sit out until the next set.
-  finishBuzz(kind, cards = []) {
+  // Right: +1 (+2 for a full spark) and everyone may buzz again. Wrong or out of time: −1 and sit out until the next match.
+  finishBuzz(kind, cards = [], points = 0) {
     const player = this.players.get(this.buzz.playerId);
     clearTimeout(this.buzz.timer);
     this.buzz = null;
-    if (kind === 'set') {
-      player.score++;
+    if (kind === 'match') {
+      player.score += points;
       for (const p of this.players.values()) p.lockedOut = false;
       if (this.game.over) this.phase = 'over';
     } else {
@@ -134,7 +135,7 @@ export class Room extends DurableObject {
       const active = [...this.players.values()].filter((p) => p.socket);
       if (active.every((p) => p.lockedOut)) for (const p of active) p.lockedOut = false;
     }
-    this.event = { seq: ++this.seq, kind, playerId: player.id, name: player.name, cards };
+    this.event = { seq: ++this.seq, kind, playerId: player.id, name: player.name, cards, points };
     this.broadcast();
   }
 

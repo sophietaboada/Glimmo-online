@@ -1,6 +1,6 @@
-# SET
+# Glimmo
 
-The card game SET, playable in any browser and installable on iPhone as a home-screen app.
+A fast card-spotting game, playable in any browser and installable on iPhone as a home-screen app.
 Play alone, or as a group with everyone on their own phone.
 
 **Play:** <https://seton-game.sophie-taboada.workers.dev>
@@ -9,8 +9,9 @@ Play alone, or as a group with everyone on their own phone.
 
 One person taps **Create a room**; the others scan the QR code on that phone with their camera, or enter
 the 4-letter room code. **Invite** shows the QR code again mid-game for anyone who arrives late.
-Everyone sees the same cards. When you spot a set, tap **SET!**: if you were first, you have 10 seconds
-to pick the three cards. Right is +1; wrong or out of time is −1 and you sit out until someone finds a set.
+Everyone sees the same cards. When you spot a match, tap **MATCH!**: if you were first, you have 10 seconds
+to pick the three cards. Right is +1, or +2 for a **full spark** (all four features different); wrong or
+out of time is −1 and you sit out until someone finds a match.
 
 ## Install on iPhone
 
@@ -43,10 +44,10 @@ its memory while people are playing; nothing is written to storage.
 
 | File | Purpose |
 | --- | --- |
-| `public/game.js` | Game rules and state (deck, board, set detection), shared by phones and server |
+| `public/game.js` | Game rules and state (deck, board, match detection), shared by phones and server |
 | `public/cards.js` | Draws cards; shared helpers |
 | `public/solo.js` | Solo game: taps, hints, timer |
-| `public/group.js` | Group game on the phone: room connection, SET! button, scores |
+| `public/group.js` | Group game on the phone: room connection, MATCH! button, scores |
 | `public/app.js` | Start menu and switching between screens |
 | `public/index.html`, `style.css` | Page layout: 3 columns on phones, 3 rows on wide screens |
 | `public/sw.js`, `manifest.webmanifest` | Offline support and home-screen install |
