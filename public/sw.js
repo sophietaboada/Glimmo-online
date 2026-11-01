@@ -1,6 +1,6 @@
 // Caches the app shell so the game works offline once installed.
 // Bump VERSION whenever you deploy changes so phones pick up the new files.
-const VERSION = 'glimmo-v8';
+const VERSION = 'glimmo-v9';
 const FILES = [
   './',
   'index.html',
